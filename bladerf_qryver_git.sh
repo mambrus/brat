@@ -17,7 +17,7 @@ function list_all_of() {
 
 	git log --oneline --tags --decorate --author-date-order | \
 		grep 'tag: '$TYPE'' | \
-		sed -E 's/^([[:xdigit:]]{7} )(.*)(tag: '$TYPE'_v[0-9]\.[0-9]\.[0-9])(.*)/\1 \3/' | \
+		sed -E 's/^([[:xdigit:]]{7} )(.*)(tag: '$TYPE'_v([0-9]\.)+[0-9])(.*)/\1 \3/' | \
 		awk '{print $1" "$3}' | sed -e 's/ '$TYPE'_/ /'
 }
 
