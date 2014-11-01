@@ -1,7 +1,7 @@
 # Environment settings common to all scripts in this package.
 # To be sourced from scripts in this package only.
 
-if [ "X${BRF_ENV_SET}"="Xy" ]; then
+if [ "X${BRF_ENV_SET}" != "Xy" ]; then
 # No need to do any this if it's already done
 	export BRF_ENV_SET='y'
 	export BRF_DIR=$(dirname $(readlink -f $0))

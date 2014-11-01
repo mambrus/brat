@@ -1,3 +1,6 @@
+if [ "X${dev_versionof_sh}" != "Xy" ]; then
+	dev_versionof_sh='y'
+
 # Returns version and SHA1-1 (if applicable) of a particular component of
 # bladerd device.
 #
@@ -36,3 +39,5 @@ function dev_versionsof() {
 	echo "$SHA1 v$VERSION"
 
 }
+
+fi
