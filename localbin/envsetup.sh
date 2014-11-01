@@ -5,13 +5,13 @@ if [ "X${BRF_ENV_SET}"="Xy" ]; then
 # No need to do any this if it's already done
 	export BRF_ENV_SET='y'
 	export BRF_DIR=$(dirname $(readlink -f $0))
-	
+
 	DFLT_BRF_VERBOSE="no"
 	DFLT_BRF_SERVER="https://www.nuand.com"
 	DFLT_BRF_FPGADIR="fpga"
 	DFLT_BRF_FX3DIR="fx3"
 	DFLT_BRF_STASH_DIR="~/.bladerf_transbin"
-	
+
 	BRF_DOTFILE=.bladerf
 	if ! [ -f "${HOME}/${BRF_DOTFILE}" ]; then
 		if [ "X${BRF_VERBOSE}" == "Xyes" ]; then
@@ -50,5 +50,24 @@ if [ "X${BRF_ENV_SET}"="Xy" ]; then
 	export PATH=$(pwd):$PATH
 
 	#source ${BRF_DIR}/.env_common
+
+	# Source either specific functions or directories from localbin
+	function INCLUDE() {
+		if [ "X${1}" == "X" ]; then
+			echo "FATAL: $0 expects one argument" 1>&2
+			exit 1
+		fi
+		local DNAME="${BRF_DIR}/localbin"
+		local FNAME="${DNAME}/${1}"
+
+		if [ -d "${FNAME}" ]; then
+			for F in $(ls ${FNAME}); do
+				local F="${FNAME}/${F}"
+				source "${F}"
+			done
+		else
+			source "${FNAME}"
+		fi
+	}
 
 fi
