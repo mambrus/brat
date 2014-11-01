@@ -51,13 +51,13 @@ if [ "X${BRF_ENV_SET}" != "Xy" ]; then
 
 	#source ${BRF_DIR}/.env_common
 
-	# Source either specific functions or directories from localbin
+	# Source either specific functions or directories from local
 	function INCLUDE() {
 		if [ "X${1}" == "X" ]; then
 			echo "FATAL: $0 expects one argument" 1>&2
 			exit 1
 		fi
-		local DNAME="${BRF_DIR}/localbin"
+		local DNAME="${BRF_DIR}"
 		local FNAME="${DNAME}/${1}"
 
 		if [ -d "${FNAME}" ]; then

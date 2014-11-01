@@ -1,6 +1,6 @@
 #! /bin/bash
 pushd $(dirname $(readlink -f $0))	>/dev/null
-source $(pwd)/localbin/envsetup.sh
+source $(pwd)/local/envsetup.sh
 popd >/dev/null
 
 TS=$(date '+%y%m%d_%H%M%S')

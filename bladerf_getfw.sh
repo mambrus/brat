@@ -1,6 +1,6 @@
 #! /bin/bash
 pushd $(dirname $(readlink -f $0))	>/dev/null
-source $(pwd)/localbin/envsetup.sh
+source $(pwd)/local/envsetup.sh
 popd >/dev/null
 
 if [ "X$1" == "X" ]; then
