@@ -1,19 +1,7 @@
 #! /bin/bash
-
-DOTFILE=.bladerf
-# Get user settings
-eval $(
-	cat "${HOME}/${DOTFILE}" | \
-	grep -vE '^#' | \
-	grep -vE '^[[:space:]]*$' | \
-	sed -E 's/^/export /'
-)
-
-if [ "X${TRANSBIN_DIR}" == "X" ]; then
-	echo "BAT config error" 1>&2
-	echo "Did you configure a [~/${DOTFILE}]?" 1>&2
-	exit 1
-fi
+pushd $(dirname $(readlink -f $0))	>/dev/null
+source $(pwd)/envsetup.sh
+popd >/dev/null
 
 set -o pipefail
 exec 3>&1 4>&2 1>/dev/null 2>/dev/null
@@ -34,11 +22,11 @@ if [ ! "x${BLADE_SZ}" == "x40" ] && [ ! "X${BLADE_SZ}" == "x115" ]; then
 	exit 1
 fi
 
-if ! [ -d "$TRANSBIN_DIR" ]; then
-	mkdir -p "$TRANSBIN_DIR"
+if ! [ -d "$BRF_STASH_DIR" ]; then
+	mkdir -p "$BRF_STASH_DIR"
 fi
 
-pushd "$TRANSBIN_DIR" >/dev/null
+pushd "$BRF_STASH_DIR" >/dev/null
 
 
 echo "Getting FPGAs..."

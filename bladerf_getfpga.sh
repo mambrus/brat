@@ -1,13 +1,9 @@
 #! /bin/bash
-BRF_SERVER=https://www.nuand.com
-BRF_FPGADIR=fpga
-TS=$(date '+%y%m%d_%H%M%S')
-
-#https://www.nuand.com/fpga/v0.1.1/hostedx40.rbf
-
-pushd $(dirname $(readlink -f $0)) >/dev/null
-export PATH=$(pwd):$PATH
+pushd $(dirname $(readlink -f $0))	>/dev/null
+source $(pwd)/envsetup.sh
 popd >/dev/null
+
+TS=$(date '+%y%m%d_%H%M%S')
 
 if [ "X$1" == "X" ]; then
 	BRF_FPGAVERSION=$(bladerf_qryfpga.sh)

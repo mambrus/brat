@@ -1,9 +1,6 @@
 #! /bin/bash
-BRF_SERVER=https://www.nuand.com
-BRF_FX3DIR=fx3
-
-pushd $(dirname $(readlink -f $0)) >/dev/null
-export PATH=$(pwd):$PATH
+pushd $(dirname $(readlink -f $0))	>/dev/null
+source $(pwd)/envsetup.sh
 popd >/dev/null
 
 if [ "X$1" == "X" ]; then

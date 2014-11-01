@@ -1,7 +1,9 @@
 #! /bin/bash
+pushd $(dirname $(readlink -f $0))	>/dev/null
+source $(pwd)/envsetup.sh
+popd >/dev/null
 
 set -o pipefail
-
 exec 3>&1 4>&2 1>/dev/null 2>/dev/null
 if ! git remote -v | grep bladeRF.git | wc -l; then
 	exec 1>&3- 2>&4-
