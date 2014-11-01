@@ -3,63 +3,78 @@ pushd $(dirname $(readlink -f $0))	>/dev/null
 source $(pwd)/local/envsetup.sh
 popd >/dev/null
 
-set -o pipefail
-exec 3>&1 4>&2 1>/dev/null 2>/dev/null
-if ! git remote -v | grep bladeRF.git | wc -l; then
-	exec 1>&3- 2>&4-
-	echo "You don't seem to be executing somewhere from withing BladeRF src-dir" 1>&2
-	exit 1
-fi
-exec 1>&3- 2>&4-
+INCLUDE funcs
 
-BRF_SHA1=$(git log --oneline | head -n1 | awk '{print $1}')
-BRF_FPGAVERSION=$(bladerf_qryver_git.sh fpga)
-BRF_FWVERSION=$(bladerf_qryver_git.sh firmware)
-BLADE_SZ=$((bladeRF-cli -e 'info' 2>/dev/null) | grep 'FPGA size' | awk '{print $3 }')
+GIT_DIR=$1
 
-if [ ! "x${BLADE_SZ}" == "x40" ] && [ ! "X${BLADE_SZ}" == "x115" ]; then
-	echo "Can't communicate with tranciever (Err=${BLADE_SZ}). Is it attached?" 1>&2
-	exit 1
+set -e
+BRF_SHA1=$(git_getsha1 "$GIT_DIR")
+BLADE_SZ=$(dev_size)
+set +e
+
+GIT_FPGA_VER_S=$(git_list_all_versionsof fpga "$GIT_DIR" | awk '{print $2}' | head -n1)
+DEV_FPGA_VER_S=$(dev_versionsof fpga "$GIT_DIR" | awk '{print $1}')
+GIT_FW_VER_S=$(git_list_all_versionsof firmware "$GIT_DIR" | head -n1)
+DEV_FW_VER_S=$(dev_versionsof firmware)
+
+GIT_FPGA_VER=$GIT_FPGA_VER_S
+DEV_FPGA_VER=$DEV_FPGA_VER_S
+GIT_FW_VER=$(awk '{print $2}' <<< $GIT_FW_VER_S)
+DEV_FW_VER=$(awk '{print $2}' <<< $DEV_FW_VER_S)
+
+FPGA_DIFFERS=no
+FW_DIFFERS=no
+
+if [ "X$GIT_FPGA_VER_S" != "X$DEV_FPGA_VER_S" ]; then
+	FPGA_DIFFERS=yes
+	FPGA_MARK='(*)'
+fi
+if [ "X$GIT_FW_VER_S" != "X$DEV_FW_VER_S" ]; then
+	FW_DIFFERS=yes
+	FW_MARK='(*)'
 fi
 
-if ! [ -d "$BRF_STASH_DIR" ]; then
-	mkdir -p "$BRF_STASH_DIR"
+if [ "X$BRF_VERBOSE" == "Xyes" ]; then
+	echo "FPGA version-check $FPGA_MARK"
+	echo "  Req: $GIT_FPGA_VER_S"
+	echo "  Dev: $DEV_FPGA_VER_S"
+	echo
+	echo "FW version-check (full) $FW_MARK"
+	echo "  Req: $GIT_FW_VER_S"
+	echo "  Dev: $DEV_FW_VER_S"
+	echo
+	echo "FW version-check $FW_MARK"
+	echo "  Req: $GIT_FW_VER"
+	echo "  Dev: $DEV_FW_VER"
+	echo
 fi
+
+bladerf_stash.sh firmware $GIT_FW_VER "$GIT_DIR"
+bladerf_stash.sh fpga $DEV_FPGA_VER "$GIT_DIR"
 
 pushd "$BRF_STASH_DIR" >/dev/null
-
-
-echo "Getting FPGAs..."
-FPGA_FILES=$(bladerf_getfpga.sh "$BRF_FPGAVERSION")
-echo "Getting FW..."
-FW_FILES=$(bladerf_getfw.sh "$BRF_FWVERSION")
-
-if ! [ -d "$BRF_SHA1" ]; then
-	mkdir $BRF_SHA1
-fi
-
-FPGA_X40=$(echo $FPGA_FILES | sed -e 's/ /\n/' | grep x40)
-FPGA_X115=$(echo $FPGA_FILES | sed -e 's/ /\n/' | grep x115)
-FPGA_FW=$(echo $FW_FILES | sed -e 's/ /\n/' | grep _fw_)
-
 pushd $BRF_SHA1 >/dev/null
-ln -sf "../${FPGA_X40}"   "${FPGA_X40}"
-ln -sf "../${FPGA_X115}"  "${FPGA_X115}"
-ln -sf "../${FPGA_FW}"    "${FPGA_FW}"
 
-echo "Flashing FPGA. Please wait..."
-if [ "x${BLADE_SZ}" == "x40" ]; then
-	bladeRF-cli -L bladeRF_fpga_x40_*.rbf
-elif [ "x${BLADE_SZ}" == "x115" ]; then
-	bladeRF-cli -L bladeRF_fpga_x115_*.rbf
+echo
+if [ "${FPGA_DIFFERS}" == "yes" ]; then
+	echo "Flashing FPGA. Please wait..."
+	if [ "x${BLADE_SZ}" == "x40" ]; then
+		bladeRF-cli -L bladeRF_fpga_x40_*.rbf
+	elif [ "x${BLADE_SZ}" == "x115" ]; then
+		bladeRF-cli -L bladeRF_fpga_x115_*.rbf
+	fi
+else
+	echo "*** Flashing FPGA skipped"
 fi
 
-
-echo "Flashing FW. Please wait..."
-bladeRF-cli bladeRF_fw_*.img
+if [ "${FW_DIFFERS}" == "yes" ]; then
+	echo "Flashing FW. Do not interrupt flashing. Please wait..."
+	bladeRF-cli -f bladeRF_fw_*.img
+else
+	echo "*** Flashing FPGA skipped"
+fi
 
 popd >/dev/null
-
-popd  >/dev/null
+popd >/dev/null
 echo "All done!"
 
