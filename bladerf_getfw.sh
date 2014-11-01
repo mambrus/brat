@@ -6,7 +6,18 @@ pushd $(dirname $(readlink -f $0)) >/dev/null
 export PATH=$(pwd):$PATH
 popd >/dev/null
 
-BRF_FWNAME=bladeRF_fw_$(bladerf_qryfw.sh).img
+if [ "X$1" == "X" ]; then
+	BRF_FWVERSION=$(bladerf_qryfw.sh)
+else
+	BRF_FWVERSION=$1
+fi
 
-wget --quiet "${BRF_SERVER}/${BRF_FX3DIR}/${BRF_FWNAME}"
+BRF_FWNAME=bladeRF_fw_${BRF_FWVERSION}.img
+
+if [ -f "${BRF_FWNAME}" ]; then
+	echo "${BRF_FWNAME} exists. Skipping..." 1>&2
+else
+	wget --quiet "${BRF_SERVER}/${BRF_FX3DIR}/${BRF_FWNAME}"
+fi
+
 ls "${BRF_FWNAME}"
