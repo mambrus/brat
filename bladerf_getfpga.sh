@@ -6,7 +6,7 @@ popd >/dev/null
 TS=$(date '+%y%m%d_%H%M%S')
 
 if [ "X$1" == "X" ]; then
-	BRF_FPGAVERSION=$(bladerf_qryfpga.sh)
+	BRF_FPGAVERSION=$(bladerf_qryver_git.sh fpga)
 else
 	BRF_FPGAVERSION=$1
 fi

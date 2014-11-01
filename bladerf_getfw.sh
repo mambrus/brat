@@ -4,7 +4,7 @@ source $(pwd)/envsetup.sh
 popd >/dev/null
 
 if [ "X$1" == "X" ]; then
-	BRF_FWVERSION=$(bladerf_qryfw.sh)
+	BRF_FWVERSION=$(bladerf_qryver_git.sh firmware)
 else
 	BRF_FWVERSION=$1
 fi

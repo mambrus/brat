@@ -13,8 +13,8 @@ fi
 exec 1>&3- 2>&4-
 
 BRF_SHA1=$(git log --oneline | head -n1 | awk '{print $1}')
-BRF_FPGAVERSION=$(bladerf_qryfpga.sh)
-BRF_FWVERSION=$(bladerf_qryfw.sh)
+BRF_FPGAVERSION=$(bladerf_qryver_git.sh fpga)
+BRF_FWVERSION=$(bladerf_qryver_git.sh firmware)
 BLADE_SZ=$((bladeRF-cli -e 'info' 2>/dev/null) | grep 'FPGA size' | awk '{print $3 }')
 
 if [ ! "x${BLADE_SZ}" == "x40" ] && [ ! "X${BLADE_SZ}" == "x115" ]; then
