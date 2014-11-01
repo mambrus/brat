@@ -1,6 +1,6 @@
 #! /bin/bash
 pushd $(dirname $(readlink -f $0))	>/dev/null
-source $(pwd)/envsetup.sh
+source $(pwd)/localbin/envsetup.sh
 popd >/dev/null
 
 set -o pipefail
