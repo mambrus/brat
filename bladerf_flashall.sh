@@ -11,12 +11,11 @@ eval $(
 
 if [ "X${TRANSBIN_DIR}" == "X" ]; then
 	echo "BAT config error" 1>&2
-	echo "Did you configure a [~/$(DOTFILE)]?" 1>&2
+	echo "Did you configure a [~/${DOTFILE}]?" 1>&2
 	exit 1
 fi
 
 set -o pipefail
-
 exec 3>&1 4>&2 1>/dev/null 2>/dev/null
 if ! git remote -v | grep bladeRF.git | wc -l; then
 	exec 1>&3- 2>&4-
@@ -25,10 +24,54 @@ if ! git remote -v | grep bladeRF.git | wc -l; then
 fi
 exec 1>&3- 2>&4-
 
-git log --oneline --tags --decorate --author-date-order | \
-	grep "tag: fpga_" | \
-	head -n1 | \
-	cut -f2 -d":" | \
-	cut -f1 -d")" | \
-	cut -f2 -d"_"
+BRF_SHA1=$(git log --oneline | head -n1 | awk '{print $1}')
+BRF_FPGAVERSION=$(bladerf_qryfpga.sh)
+BRF_FWVERSION=$(bladerf_qryfw.sh)
+BLADE_SZ=$((bladeRF-cli -e 'info' 2>/dev/null) | grep 'FPGA size' | awk '{print $3 }')
+
+if [ ! "x${BLADE_SZ}" == "x40" ] && [ ! "X${BLADE_SZ}" == "x115" ]; then
+	echo "Can't communicate with tranciever (Err=${BLADE_SZ}). Is it attached?" 1>&2
+	exit 1
+fi
+
+if ! [ -d "$TRANSBIN_DIR" ]; then
+	mkdir -p "$TRANSBIN_DIR"
+fi
+
+pushd "$TRANSBIN_DIR" >/dev/null
+
+
+echo "Getting FPGAs..."
+FPGA_FILES=$(bladerf_getfpga.sh "$BRF_FPGAVERSION")
+echo "Getting FW..."
+FW_FILES=$(bladerf_getfw.sh "$BRF_FWVERSION")
+
+if ! [ -d "$BRF_SHA1" ]; then
+	mkdir $BRF_SHA1
+fi
+
+FPGA_X40=$(echo $FPGA_FILES | sed -e 's/ /\n/' | grep x40)
+FPGA_X115=$(echo $FPGA_FILES | sed -e 's/ /\n/' | grep x115)
+FPGA_FW=$(echo $FW_FILES | sed -e 's/ /\n/' | grep _fw_)
+
+pushd $BRF_SHA1 >/dev/null
+ln -sf "../${FPGA_X40}"   "${FPGA_X40}"
+ln -sf "../${FPGA_X115}"  "${FPGA_X115}"
+ln -sf "../${FPGA_FW}"    "${FPGA_FW}"
+
+echo "Flashing FPGA. Please wait..."
+if [ "x${BLADE_SZ}" == "x40" ]; then
+	bladeRF-cli -L bladeRF_fpga_x40_*.rbf
+elif [ "x${BLADE_SZ}" == "x115" ]; then
+	bladeRF-cli -L bladeRF_fpga_x115_*.rbf
+fi
+
+
+echo "Flashing FW. Please wait..."
+bladeRF-cli bladeRF_fw_*.img
+
+popd >/dev/null
+
+popd  >/dev/null
+echo "All done!"
 
