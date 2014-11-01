@@ -10,25 +10,25 @@ if [ "X${BRF_ENV_SET}" != "Xy" ]; then
 	DFLT_BRF_SERVER="https://www.nuand.com"
 	DFLT_BRF_FPGADIR="fpga"
 	DFLT_BRF_FX3DIR="fx3"
-	DFLT_BRF_STASH_DIR="~/.bladerf_transbin"
+	DFLT_BRF_STASH_DIR="${HOME}/.bladerf_transbin"
 
-	BRF_DOTFILE=.bladerf
-	if ! [ -f "${HOME}/${BRF_DOTFILE}" ]; then
+	BRF_DOTFILE="${HOME}/.bladerf"
+	if [ ! -f "${BRF_DOTFILE}" ]; then
 		if [ "X${BRF_VERBOSE}" == "Xyes" ]; then
 			echo "WARN: ${BRF_DOTFILE} not setup - Creating a default." 1>&2
 		fi
 		touch ${BRF_DOTFILE}
-		echo "DFLT_BRF_VERBOSE=${DFLT_BRF_VERBOSE}"
-		echo "DFLT_BRF_SERVER=${DFLT_BRF_SERVER}"
-		echo "DFLT_BRF_FPGADIR=${DFLT_BRF_FPGADIR}"
-		echo "DFLT_BRF_FX3DIR=${DFLT_BRF_FX3DIR}"
-		echo "DFLT_BRF_STASH_DIR=${DFLT_BRF_STASH_DIR}"
+		echo "BRF_VERBOSE=${DFLT_BRF_VERBOSE}"      >> ${BRF_DOTFILE}
+		echo "BRF_SERVER=${DFLT_BRF_SERVER}"        >> ${BRF_DOTFILE}
+		echo "BRF_FPGADIR=${DFLT_BRF_FPGADIR}"      >> ${BRF_DOTFILE}
+		echo "BRF_FX3DIR=${DFLT_BRF_FX3DIR}"        >> ${BRF_DOTFILE}
+		echo "BRF_STASH_DIR=${DFLT_BRF_STASH_DIR}"  >> ${BRF_DOTFILE}
 	fi
 	# Get user settings and set if not set
 	# Parse one line at a time (i.e. each setting in config in config is a
 	# fall-back and can be overloaded)
 	for L in $(
-		cat "${HOME}/${BRF_DOTFILE}" | \
+		cat "${BRF_DOTFILE}" | \
 		grep -vE '^#' | \
 		grep -vE '^[[:space:]]*$'
 	); do
@@ -69,5 +69,6 @@ if [ "X${BRF_ENV_SET}" != "Xy" ]; then
 			source "${FNAME}"
 		fi
 	}
+	typeset -fx INCLUDE
 
 fi
