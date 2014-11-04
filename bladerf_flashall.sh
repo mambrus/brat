@@ -50,7 +50,7 @@ if [ "X$BRF_VERBOSE" == "Xyes" ]; then
 fi
 
 bladerf_stash.sh firmware $GIT_FW_VER "$GIT_DIR"
-bladerf_stash.sh fpga $DEV_FPGA_VER "$GIT_DIR"
+bladerf_stash.sh fpga $GIT_FPGA_VER "$GIT_DIR"
 
 pushd "$BRF_STASH_DIR" >/dev/null
 pushd $BRF_SHA1 >/dev/null
@@ -71,7 +71,7 @@ if [ "${FW_DIFFERS}" == "yes" ]; then
 	echo "Flashing FW. Do not interrupt flashing. Please wait..."
 	bladeRF-cli -f bladeRF_fw_*.img
 else
-	echo "*** Flashing FPGA skipped"
+	echo "*** Flashing FW skipped"
 fi
 
 popd >/dev/null
