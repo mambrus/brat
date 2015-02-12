@@ -57,21 +57,35 @@ pushd $BRF_SHA1 >/dev/null
 
 echo
 if [ "${FPGA_DIFFERS}" == "yes" ]; then
-	echo "Flashing FPGA. Please wait..."
+	NF=$(eval ls bladeRF_fpga_*.rbf | wc -l)
+	if [ $NF -gt 2 ]; then
+		echo "**********************************************************"  1>&2
+		echo " Warning: More than two FPGA in stash-dir"                   1>&2
+		echo "          Found FPGA:s in [$BRF_STASH_DIR/$BRF_SHA1]: [$NF]" 1>&2
+		echo "**********************************************************"  1>&2
+	fi
+	echo "Flashing FPGA [$GIT_FPGA_VER_S]. Please wait..."
 	if [ "x${BLADE_SZ}" == "x40" ]; then
-		bladeRF-cli -L bladeRF_fpga_x40_*.rbf
+		bladeRF-cli -L bladeRF_fpga_x40_${GIT_FPGA_VER_S}.rbf
 	elif [ "x${BLADE_SZ}" == "x115" ]; then
-		bladeRF-cli -L bladeRF_fpga_x115_*.rbf
+		bladeRF-cli -L bladeRF_fpga_x115_${GIT_FPGA_VER_S}.rbf
 	fi
 else
-	echo "*** Flashing FPGA skipped"
+	echo "*** Flashing FPGA [$GIT_FPGA_VER_S] skipped"
 fi
 
 if [ "${FW_DIFFERS}" == "yes" ]; then
-	echo "Flashing FW. Do not interrupt flashing. Please wait..."
-	bladeRF-cli -f bladeRF_fw_*.img
+	NF=$(eval ls bladeRF_fw_*.img | wc -l)
+	if [ $NF -gt 1 ]; then
+		echo "**********************************************************"  1>&2
+		echo " Warning: More than one FW in stash-dir"                     1>&2
+		echo "          Found FW:s in [$BRF_STASH_DIR/$BRF_SHA1]: [$NF]"   1>&2
+		echo "**********************************************************"  1>&2
+	fi
+	echo "Flashing FW [$GIT_FW_VER_S]. Do not interrupt flashing. Please wait..."
+	bladeRF-cli -f bladeRF_fw_${GIT_FW_VER}.img
 else
-	echo "*** Flashing FW skipped"
+	echo "*** Flashing FW [$GIT_FW_VER_S] skipped"
 fi
 
 popd >/dev/null
