@@ -19,7 +19,13 @@ fi
 if [ "X${1}" == "Xfpga" ]; then
 	dev_versionsof $TYPE | head -n1 | awk '{print $1}'
 elif [ "X${1}" == "Xfirmware" ]; then
-	dev_versionsof $TYPE | head -n1 | awk '{print $2}'
+	
+	#BIG FAT NOTE
+	#=========================
+	#Used to be $2, why!?
+	#dev_versionsof $TYPE | head -n1 | awk '{print $2}'
+
+	dev_versionsof $TYPE | head -n1 | awk '{print $1}'
 else
 	echo "Error: $(basename $(readlink -f $0)) expects one argument [\"firmware\"|\"fpga\"]" 1>&2
 	exit 1
