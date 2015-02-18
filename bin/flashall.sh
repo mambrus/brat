@@ -12,6 +12,11 @@ BRF_SHA1=$(git_getsha1 "$GIT_DIR")
 BLADE_SZ=$(dev_size)
 set +e
 
+function doV() {
+	echo "${@}"
+	${@}
+}
+
 GIT_FPGA_VER_S=$(git_list_all_versionsof fpga "$GIT_DIR" | awk '{print $2}' | head -n1)
 DEV_FPGA_VER_S=$(dev_versionsof fpga "$GIT_DIR" | awk '{print $1}')
 GIT_FW_VER_S=$(git_list_all_versionsof firmware "$GIT_DIR" | head -n1)
@@ -49,8 +54,8 @@ if [ "X$BRF_VERBOSE" == "Xyes" ]; then
 	echo
 fi
 
-stash.sh firmware $GIT_FW_VER "$GIT_DIR"
-stash.sh fpga $GIT_FPGA_VER "$GIT_DIR"
+doV stash.sh firmware $GIT_FW_VER "$GIT_DIR"
+doV stash.sh fpga $GIT_FPGA_VER "$GIT_DIR"
 
 pushd "$BRF_STASH_DIR" >/dev/null
 pushd $BRF_SHA1 >/dev/null
@@ -71,7 +76,8 @@ if [ "${FPGA_DIFFERS}" == "yes" ]; then
 		bladeRF-cli -L bladeRF_fpga_x115_${GIT_FPGA_VER_S}.rbf
 	fi
 else
-	echo "*** Flashing FPGA [$GIT_FPGA_VER_S] skipped"
+	echo "*** Flashing FPGA [$GIT_FPGA_VER_S] skipped."
+	echo "*** Already correct FPGA version on device [$DEV_FPGA_VER_S]."
 fi
 
 if [ "${FW_DIFFERS}" == "yes" ]; then
@@ -86,6 +92,7 @@ if [ "${FW_DIFFERS}" == "yes" ]; then
 	bladeRF-cli -f bladeRF_fw_${GIT_FW_VER}.img
 else
 	echo "*** Flashing FW [$GIT_FW_VER_S] skipped"
+	echo "*** Already correct FW version on device [$DEV_FW_VER_S]."
 fi
 
 popd >/dev/null

@@ -1,9 +1,9 @@
 #! /bin/bash
 # Updates the stash & update cross-match matrix.
 # Downloads if needed, but tries not to
-if [ $# -ne 1 ]; then
-	echo -n "ERROR: $(basename $(readlink -f $0)) takes/need one "
-	echo "argument: <\"firmware\">|<\"fpga\">" 1>&2
+if [ $# -lt 1 ]; then
+	echo -n "ERROR: $(basename $(readlink -f $0)) takes 1-3 "
+	echo "arguments: <\"firmware\">|<\"fpga\"> [version] [stashdir]" 1>&2
 	exit 1
 fi
 
