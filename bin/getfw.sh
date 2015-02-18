@@ -1,10 +1,16 @@
 #! /bin/bash
+# Gets firmware binary from server to the directory from where invoked
+# Script takes either one or no argument.
+#
+# No arg) Get the version matching your current git-HEAD
+# arg #1) Get a specific version
+
 pushd $(dirname $(readlink -f $0))	>/dev/null
-source $(pwd)/local/envsetup.sh
+source $(pwd)/../local/envsetup.sh
 popd >/dev/null
 
 if [ "X$1" == "X" ]; then
-	BRF_FWVERSION=$(bladerf_qryver_git.sh firmware)
+	BRF_FWVERSION=$(qryver_git.sh firmware)
 else
 	BRF_FWVERSION=$1
 fi

@@ -1,9 +1,14 @@
 #! /bin/bash
 # Updates the stash & update cross-match matrix.
 # Downloads if needed, but tries not to
+if [ $# -ne 1 ]; then
+	echo -n "ERROR: $(basename $(readlink -f $0)) takes/need one "
+	echo "argument: <\"firmware\">|<\"fpga\">" 1>&2
+	exit 1
+fi
 
 pushd $(dirname $(readlink -f $0))	>/dev/null
-source $(pwd)/local/envsetup.sh
+source $(pwd)/../local/envsetup.sh
 popd >/dev/null
 
 INCLUDE funcs
@@ -41,7 +46,7 @@ fi
 pushd "$BRF_STASH_DIR" >/dev/null
 
 echo "Getting $TYPE for version [$BRF_VERSION]..."
-DL_FILES=$(bladerf_get${TOOL}.sh "$BRF_VERSION")
+DL_FILES=$(get${TOOL}.sh "$BRF_VERSION")
 
 if ! [ -d "$BRF_SHA1" ]; then
 	mkdir $BRF_SHA1
@@ -55,6 +60,7 @@ else
 fi
 
 pushd $BRF_SHA1 >/dev/null
+echo "X-linking [${BRF_SHA1}/*] to [${BRF_STASH_DIR}/]"
 
 if [ $TOOL == "fw" ]; then
 	ln -sf "../${FPGA_FW}"    "${FPGA_FW}"

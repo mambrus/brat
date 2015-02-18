@@ -58,7 +58,7 @@ if [ "X${BRF_ENV_SET}" != "Xy" ]; then
 			exit 1
 		fi
 		local DNAME="${BRF_DIR}"
-		local FNAME="${DNAME}/${1}"
+		local FNAME="${DNAME}/../${1}"
 
 		if [ -d "${FNAME}" ]; then
 			for F in $(ls ${FNAME}); do

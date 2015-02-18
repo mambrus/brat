@@ -3,14 +3,14 @@
 # This script pulls out the Serial IDentity in the format required for
 # bladeRF-cli -p flag.
 
-# To identify a bladerf device for -p is a nuance as bus and address keeps
+# To identify a bladeRF device for -p is a nuance as bus and address keeps
 # changing on each attachment. As the serial number is probably unique
 # enough, all you need is this number in buffer or given in scripts and
 # you're good to go.
 
 # Use like this:
 
-# bladeRF-cli -p $(bladerf_sid.sh <#serial>) ...
+# bladeRF-cli -p $(brat sid <#serial>) ...
 
 if [ $# -ne 1 ]; then
 	echo "ERROR: $(basename $(readlink -f $0)) takes/need one argument only (SERIAL)" 1>&2

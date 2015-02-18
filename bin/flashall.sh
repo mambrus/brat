@@ -1,6 +1,6 @@
 #! /bin/bash
 pushd $(dirname $(readlink -f $0))	>/dev/null
-source $(pwd)/local/envsetup.sh
+source $(pwd)/../local/envsetup.sh
 popd >/dev/null
 
 INCLUDE funcs
@@ -49,8 +49,8 @@ if [ "X$BRF_VERBOSE" == "Xyes" ]; then
 	echo
 fi
 
-bladerf_stash.sh firmware $GIT_FW_VER "$GIT_DIR"
-bladerf_stash.sh fpga $GIT_FPGA_VER "$GIT_DIR"
+stash.sh firmware $GIT_FW_VER "$GIT_DIR"
+stash.sh fpga $GIT_FPGA_VER "$GIT_DIR"
 
 pushd "$BRF_STASH_DIR" >/dev/null
 pushd $BRF_SHA1 >/dev/null

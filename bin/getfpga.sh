@@ -1,12 +1,18 @@
 #! /bin/bash
+# Gets fpga binary from server to the directory from where invoked
+# Script takes either one or no argument.
+#
+# No arg) Get the version matching your current git-HEAD
+# arg #1) Get a specific version
+
 pushd $(dirname $(readlink -f $0))	>/dev/null
-source $(pwd)/local/envsetup.sh
+source $(pwd)/../local/envsetup.sh
 popd >/dev/null
 
 TS=$(date '+%y%m%d_%H%M%S')
 
 if [ "X$1" == "X" ]; then
-	BRF_FPGAVERSION=$(bladerf_qryver_git.sh fpga)
+	BRF_FPGAVERSION=$(qryver_git.sh fpga)
 else
 	BRF_FPGAVERSION=$1
 fi
