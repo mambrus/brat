@@ -18,7 +18,7 @@ if [ $# -ne 1 ]; then
 fi
 
 bladeRF-cli -p | \
-	grep 9d39ad51b7873293c26c7883b487d5b1 -B1 -A2 | \
+	grep $1 -B1 -A2 | \
 	awk '
 		NR==1{BACKEND=$2}
 		NR==2{SERIAL=$2}
