@@ -9,8 +9,11 @@ if [ $# -gt 1 ]; then
 	exit
 fi
 
-export BLADERF_LOG_LEVEL="debug"
+export BLADERF_LOG_LEVEL="warning"
 export SERIAL=${1}
+
+# Set default output directory to $PWD unless not set by env-var.
+export OUTDIR=${OUTDIR-$(pwd)}
 
 #Create filename for log of FS-legal characters
 LOGNAME=$(echo "${SERIAL}_$(date +"%s").log" |
@@ -38,4 +41,4 @@ function testloop() {
 	done
 }
 
-( testloop 2>&1 ) | tee "${LOGNAME}"
+( testloop 2>&1 ) | tee "${OUTDIR}/${LOGNAME}"
